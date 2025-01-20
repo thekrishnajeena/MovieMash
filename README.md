@@ -2,7 +2,7 @@
 
 ![MovieMash](/app/src/main/ic_launcher-playstore.png)  
 
---app link : ![MovieMash](/app/release/app-release.apk)
+--app link : [MovieMash](/app/release/app-release.apk)
 
 ---
 
