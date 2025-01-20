@@ -1,54 +1,62 @@
 package com.krishnajeena.moviemash.ui.screens
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.rememberScrollableState
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import androidx.navigation.NavHostController
+import coil3.compose.AsyncImage
+import coil3.compose.SubcomposeAsyncImage
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
-import com.bumptech.glide.request.RequestOptions
-import com.krishnajeena.moviemash.R
-import com.krishnajeena.moviemash.data.Details
 import com.krishnajeena.moviemash.data.DetailsViewModel
-import org.koin.androidx.compose.koinViewModel
 import com.krishnajeena.moviemash.ui.Result
 import com.valentinilk.shimmer.shimmer
-
-@OptIn(ExperimentalGlideComposeApi::class)
+import org.koin.androidx.compose.koinViewModel
+@OptIn(ExperimentalGlideComposeApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun DetailsScreen(modifier: Modifier = Modifier, navController: NavHostController, id: String?) {
-
-    val context = LocalContext.current
+fun DetailsScreen(
+    modifier: Modifier = Modifier,
+    navController: NavHostController,
+    id: String?
+) {
     val viewModel: DetailsViewModel = koinViewModel()
-
-
     val uiState by viewModel.uiState.observeAsState()
+    val refreshState = rememberPullToRefreshState()
+    var isRefreshing by remember { mutableStateOf(false) }
 
     LaunchedEffect(id) {
         if (id != null) {
@@ -56,79 +64,163 @@ fun DetailsScreen(modifier: Modifier = Modifier, navController: NavHostControlle
         }
     }
 
-    when(uiState){
-        is Result.Loading -> {
-            Column(modifier = Modifier
-                .fillMaxSize()){
-                //  Details(details = details)
-                GlideImage(model = null, contentDescription = null, modifier = Modifier.fillMaxWidth().fillMaxHeight(.4f)
-                    .shimmer()
-                    )
-                Column(modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(5.dp)){
-                    Row(modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center)
-                    {
-                        Column(modifier = Modifier.fillMaxSize(),
-                            verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally){
-                            Text("", modifier = Modifier.fillMaxWidth(.6f).shimmer())
-                            Text("", modifier = Modifier.fillMaxWidth(.6f).shimmer())
-                        }
-                    }
-
-                    Text("", modifier = Modifier.fillMaxWidth(.5f).shimmer())
-                    Text("", modifier = Modifier.fillMaxWidth().fillMaxHeight(.4f).shimmer())
-                }
-
+    PullToRefreshBox(
+        state = refreshState,
+        isRefreshing = isRefreshing,
+        onRefresh = {
+            if (id != null) {
+                viewModel.fetchDetails(id)
+                isRefreshing = true
             }
         }
-        is Result.Success -> {
-            val details = (uiState as Result.Success).data
-
-            Box(modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center){
-
-                val scrollState = rememberScrollState()
-                if (id != null) {
-                    Column(modifier = Modifier
+    ) {
+        when (uiState) {
+            is Result.Loading -> {
+                isRefreshing = true
+                Column(
+                    modifier = Modifier
                         .fillMaxSize()
-                        .verticalScroll(scrollState)){
-                  //  Details(details = details)
-                    GlideImage(model = details.poster, contentScale = ContentScale.FillWidth, contentDescription = details.originalTitle,
-                        )
-                    Column(modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(5.dp)){
-                        Row(modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center)
-                    {
-                        Column(modifier = Modifier.fillMaxSize(),
-                            verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally){
-                        Text(details.title, fontSize = 22.sp, fontWeight = FontWeight.Bold)
-                            Text("Release Data: ${details.releaseDate}")
+                ) {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .shimmer()
+                            .height(450.dp)
+                    ) {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text("Loading...", modifier = Modifier.shimmer())
                         }
                     }
 
-                        Text("Description", fontWeight = FontWeight.SemiBold, modifier = Modifier.fillMaxWidth().
-                        padding(start = 2.dp))
-                        Text("${details.plotOverview}", modifier = Modifier.padding(2.dp))
-                }
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(5.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            Column(
+                                modifier = Modifier.fillMaxSize(),
+                                verticalArrangement = Arrangement.Center,
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text(
+                                    "           ",
+                                    modifier = Modifier
+                                        .fillMaxWidth(0.6f)
+                                        .shimmer()
+                                )
+                                Text(
+                                    "          ",
+                                    modifier = Modifier
+                                        .fillMaxWidth(0.6f)
+                                        .shimmer()
+                                )
+                            }
+                        }
 
+                        Text(
+                            "         ",
+                            modifier = Modifier
+                                .fillMaxWidth(0.5f)
+                                .shimmer()
+                        )
+                        Text(
+                            "          \n\n\n\n",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .fillMaxHeight(0.4f)
+
+                                .shimmer()
+                        )
                     }
                 }
+            }
 
+            is Result.Success -> {
+                isRefreshing = false
+                val details = (uiState as Result.Success).data
+                val scrollState = rememberScrollState()
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(scrollState)
+                ) {
+                    GlideImage(
+                        model = details.poster,
+                        contentScale = ContentScale.FillWidth,
+                        contentDescription = details.originalTitle,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .defaultMinSize(minHeight = 400.dp)
+
+                    )
+
+
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(5.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            Column(
+                                modifier = Modifier.fillMaxSize(),
+                                verticalArrangement = Arrangement.Center,
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text(
+                                    details.title,
+                                    fontSize = 22.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                                Text("Release Date: ${details.releaseDate}")
+                            }
+                        }
+
+                        Text(
+                            "Description",
+                            fontWeight = FontWeight.SemiBold,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(start = 2.dp)
+                        )
+                        Text(
+                            "${details.plotOverview}",
+                            modifier = Modifier.padding(2.dp)
+                        )
+                    }
+                }
+            }
+
+            is Result.Error -> {
+                isRefreshing = false
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Button(onClick = { if (id != null) viewModel.fetchDetails(id)
+                        isRefreshing=true}) {
+                            Text("Retry")
+                        }
+                    }
+                }
+            }
+
+            null -> {
+                isRefreshing = false
             }
         }
-        is Result.Error -> {
-            Text("Error: ${(uiState as Result.Error).message}")
-        }
-
-        null -> {}
     }
-
-
-
 }

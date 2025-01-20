@@ -33,7 +33,6 @@ class HomeViewModel(private val repository: MovieMashRepository) : ViewModel() {
                 { error ->
                     _uiState.value = Result.Error(error.message ?: "Unknown Error") }
             )
-        Log.i("TAG:::::HMV", uiState.value.toString())
     }
 
     @SuppressLint("CheckResult")

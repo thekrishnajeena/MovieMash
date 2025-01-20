@@ -52,6 +52,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.runtime.livedata)
+    implementation(libs.androidx.material3.android)
 
     // Unit and Instrumentation Tests
     testImplementation(libs.junit)
@@ -95,4 +96,9 @@ dependencies {
 
     implementation("com.valentinilk.shimmer:compose-shimmer:1.3.1")
 
+    implementation("androidx.compose.material:material:1.7.6")
+
+    implementation("androidx.compose.material:material-icons-core:1.5.3")
+
+    
 }
