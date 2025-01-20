@@ -2,6 +2,7 @@ package com.krishnajeena.moviemash.ui.screens
 
 import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -14,7 +15,6 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
@@ -28,10 +28,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.krishnajeena.moviemash.data.HomeViewModel
+import coil3.compose.AsyncImage
+import com.krishnajeena.moviemash.R
+import com.krishnajeena.moviemash.models.HomeViewModel
 import com.krishnajeena.moviemash.data.ReleaseSuccessResponse
 import com.krishnajeena.moviemash.ui.Result
 import com.valentinilk.shimmer.shimmer
@@ -51,7 +54,7 @@ fun TVScreen(navController: NavController) {
         isRefreshing = isRefreshing,
         onRefresh = {
             isRefreshing = true
-            viewModel.fetchData() // Trigger data fetching
+            viewModel.fetchData()
         }
     ) {
         when (uiState) {
@@ -62,13 +65,25 @@ fun TVScreen(navController: NavController) {
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .shimmer()
-                                .height(150.dp)
+                                .height(250.dp)
                         ) {
                             Box(
                                 modifier = Modifier.fillMaxSize(),
                                 contentAlignment = Alignment.Center
                             ) {
-                                Text("Loading...", modifier = Modifier.shimmer())
+                                Column(modifier = Modifier.fillMaxSize(),
+                                    verticalArrangement = Arrangement.Center,
+                                    horizontalAlignment = Alignment.CenterHorizontally) {
+
+                                    AsyncImage(
+                                        model = R.mipmap.ic_launcher,
+                                        contentScale = ContentScale.Crop,
+                                        contentDescription = "MovieMash",
+                                        modifier = Modifier
+                                    )
+                                    Text("Loading...", modifier = Modifier.shimmer()
+                                        .height(25.dp))
+                                }
                             }
                         }
                     }
@@ -76,7 +91,7 @@ fun TVScreen(navController: NavController) {
             }
 
             is Result.Success<*> -> {
-                isRefreshing = false // Stop refreshing after success
+                isRefreshing = false
 
                 val (movies, tvShows) = (uiState as Result.Success<Pair<ReleaseSuccessResponse, ReleaseSuccessResponse>>).data
 
@@ -85,7 +100,7 @@ fun TVScreen(navController: NavController) {
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(150.dp)
+                                .height(250.dp)
                                 .background(Color.Gray)
                                 .padding(2.dp),
                             onClick = { navController.navigate("detailsScreen/${tvShow.id}") }
@@ -94,7 +109,19 @@ fun TVScreen(navController: NavController) {
                                 modifier = Modifier.fillMaxSize(),
                                 contentAlignment = Alignment.Center
                             ) {
-                                Text(text = tvShow.title)
+                                Column(modifier = Modifier.fillMaxSize(),
+                                        verticalArrangement = Arrangement.Center,
+                                    horizontalAlignment = Alignment.CenterHorizontally) {
+
+                                    AsyncImage(
+                                        model = R.mipmap.ic_launcher,
+                                        contentScale = ContentScale.Crop,
+                                        contentDescription = "MovieMash",
+                                        modifier = Modifier
+                                    )
+                                    Text(text = tvShow.title, modifier = Modifier.padding(2.dp)
+                                        .height(25.dp))
+                                }
                             }
                         }
                     }
@@ -102,15 +129,13 @@ fun TVScreen(navController: NavController) {
             }
 
             is Result.Error -> {
-                isRefreshing = false // Stop refreshing even if there's an error
+                isRefreshing = false
 
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                      //  Text("Error: ${(uiState as Result.Error).message}")
-                        Spacer(modifier = Modifier.height(8.dp))
                         Button(onClick = { viewModel.fetchData() }) {
                             Text("Retry")
                         }
@@ -140,26 +165,38 @@ fun MovieScreen(modifier: Modifier = Modifier, navController: NavController) {
         state = refreshState,
         isRefreshing = isRefreshing,
         onRefresh = {
-            viewModel.fetchData() // Trigger data fetching
+            viewModel.fetchData()
             isRefreshing = true
         }
     ) {
         when (uiState) {
             is Result.Loading -> {
-                isRefreshing = true // Show refreshing indicator during loading
+                isRefreshing = true
                 LazyVerticalGrid(GridCells.Fixed(2)) {
                     items(100) { item ->
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .shimmer()
-                                .height(150.dp)
+                                .height(250.dp)
                         ) {
                             Box(
                                 modifier = Modifier.fillMaxSize(),
                                 contentAlignment = Alignment.Center
                             ) {
-                                Text("Loading...", modifier = Modifier.shimmer())
+                                Column(modifier = Modifier.fillMaxSize(),
+                                    verticalArrangement = Arrangement.Center,
+                                    horizontalAlignment = Alignment.CenterHorizontally) {
+
+                                    AsyncImage(
+                                        model = R.mipmap.ic_launcher,
+                                        contentScale = ContentScale.Crop,
+                                        contentDescription = "MovieMash",
+                                        modifier = Modifier
+                                    )
+                                    Text("Loading...", modifier = Modifier.shimmer()
+                                        .height(25.dp))
+                                }
                             }
                         }
                     }
@@ -167,7 +204,7 @@ fun MovieScreen(modifier: Modifier = Modifier, navController: NavController) {
             }
 
             is Result.Success<*> -> {
-                isRefreshing = false // Stop refreshing after success
+                isRefreshing = false
                 val (movies, tvShows) = (uiState as Result.Success<Pair<ReleaseSuccessResponse, ReleaseSuccessResponse>>).data
 
                 LazyVerticalGrid(GridCells.Fixed(2)) {
@@ -175,7 +212,7 @@ fun MovieScreen(modifier: Modifier = Modifier, navController: NavController) {
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(150.dp)
+                                .height(250.dp)
                                 .background(Color.Gray)
                                 .padding(2.dp),
                             onClick = { navController.navigate("detailsScreen/${movie.id}") }
@@ -184,7 +221,14 @@ fun MovieScreen(modifier: Modifier = Modifier, navController: NavController) {
                                 modifier = Modifier.fillMaxSize(),
                                 contentAlignment = Alignment.Center
                             ) {
-                                Text(text = movie.title)
+                                Column(modifier = Modifier.fillMaxSize(),
+                                    verticalArrangement = Arrangement.Center,
+                                    horizontalAlignment = Alignment.CenterHorizontally){
+                                AsyncImage(model = R.mipmap.ic_launcher, contentScale = ContentScale.Crop,
+                                    contentDescription = "MovieMash", modifier = Modifier)
+                                Text(text = movie.title, modifier = Modifier.padding(2.dp)
+                                    .height(25.dp))
+                                }
                             }
                         }
                     }
@@ -192,16 +236,14 @@ fun MovieScreen(modifier: Modifier = Modifier, navController: NavController) {
             }
 
             is Result.Error -> {
-                isRefreshing = false // Stop refreshing even if there's an error
+                isRefreshing = false
 
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                       // Text("Error: ${(uiState as Result.Error).message}")
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Button(onClick = { viewModel.fetchData() }) {
+                       Button(onClick = { viewModel.fetchData() }) {
                             Text("Retry")
                         }
                     }

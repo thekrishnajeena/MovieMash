@@ -1,10 +1,8 @@
 package com.krishnajeena.moviemash.network
 
 import com.krishnajeena.moviemash.data.Details
-import com.krishnajeena.moviemash.data.Movie
 import com.krishnajeena.moviemash.data.MovieResponse
 import com.krishnajeena.moviemash.data.ReleaseSuccessResponse
-import com.krishnajeena.moviemash.data.TVShow
 import com.krishnajeena.moviemash.data.TVShowResponse
 import io.reactivex.rxjava3.core.Single
 import retrofit2.http.GET
@@ -22,7 +20,6 @@ interface ApiService {
     @GET("v1/releases/")
     fun getTVShows(
         @Query("apiKey") apiKey: String,
-       // @Query("type") type: String = "tvshow"
     ): Single<TVShowResponse>
 
     @GET("v1/releases/")
@@ -40,8 +37,7 @@ interface ApiService {
     fun getDetails(
         @Path("titleId") titleId: String,
         @Query("apiKey") apiKey: String,
-         // Use @Path here instead of @Query
-        @Query("append_to_response") appendToResponse: String // Follow proper naming conventions
+        @Query("append_to_response") appendToResponse: String
     ): Single<Details>
 
 }

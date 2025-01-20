@@ -1,10 +1,12 @@
-package com.krishnajeena.moviemash.data
+package com.krishnajeena.moviemash.models
 
 import android.annotation.SuppressLint
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.krishnajeena.moviemash.data.Details
+import com.krishnajeena.moviemash.repository.MovieMashRepository
 import com.krishnajeena.moviemash.ui.Result
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.schedulers.Schedulers
