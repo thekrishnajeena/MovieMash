@@ -4,6 +4,8 @@ plugins {
     alias(libs.plugins.kotlin.compose)
 }
 
+val apiKey = project.findProperty("API_KEY") ?: "qgmqEMrZ0YvuILwkQD6ROsd4KgiOtRa9XJtbO8tJ"
+
 android {
     namespace = "com.krishnajeena.moviemash"
     compileSdk = 35
@@ -16,15 +18,19 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField("String", "API_KEY", "\"${apiKey}\"")
     }
 
     buildTypes {
+
         release {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            buildConfigField("String", "API_KEY", "\"${apiKey}\"")
         }
     }
     compileOptions {
@@ -36,8 +42,12 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
+
 }
+
+
 dependencies {
 
     // Core AndroidX
