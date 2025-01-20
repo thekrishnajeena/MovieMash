@@ -1,7 +1,6 @@
 # MovieMash  
 
-![App Logo Placeholder]  
-*(Add a stunning image of your app logo or a banner here)*  
+![MovieMash](/app/src/main/ic_launcher-playstore.png)  
 
 ---
 
@@ -76,5 +75,5 @@ This project was a fantastic learning experience! I’m grateful for resources l
 ---
 
 ### 👩‍💻 Author  
-**[Your Name]**  
+**[Krishna Jeena]**  
 A passionate developer always eager to learn and create! 😊
